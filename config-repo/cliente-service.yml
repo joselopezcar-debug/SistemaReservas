@@ -30,6 +30,10 @@ management:
       exposure:
         include: health,info,metrics
 
+app:
+  messages:
+    error-service: "No fue posible consultar el servicio. Intente nuevamente."
+
 info:
   app:
     name: Cliente Service
