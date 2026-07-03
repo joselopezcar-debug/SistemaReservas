@@ -1,0 +1,19 @@
+server:
+  port: 8761
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+info:
+  app:
+    name: Eureka Server
+    description: Servidor de descubrimiento de servicios
+    version: 1.0
