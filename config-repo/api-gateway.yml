@@ -5,6 +5,28 @@ spring:
   application:
     name: api-gateway
 
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+
+      routes:
+        - id: cliente-service
+          uri: lb://cliente-service
+          predicates:
+            - Path=/api/clientes/**
+
+        - id: reserva-service
+          uri: lb://reserva-service
+          predicates:
+            - Path=/api/reservas/**
+
+        - id: historial-service
+          uri: lb://historial-service
+          predicates:
+            - Path=/api/historial/**
+
 eureka:
   client:
     service-url:
