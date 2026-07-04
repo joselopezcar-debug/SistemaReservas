@@ -1,13 +1,13 @@
 package com.tecsup.service;
 
 import com.tecsup.client.ReservaClient;
-import com.tecsup.dto.HistorialDTO;
-import com.tecsup.dto.ReservaDTO;
+import com.tecsup.dto.*;
 import com.tecsup.exception.ResourceNotFoundException;
 import com.tecsup.model.Historial;
 import com.tecsup.repository.HistorialRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import org.slf4j.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +18,7 @@ public class HistorialService {
 
     private final HistorialRepository repository;
     private final ReservaClient reservaClient;
+    private static final Logger logger = LoggerFactory.getLogger(HistorialService.class);
 
     public HistorialService(HistorialRepository repository,
                             ReservaClient reservaClient) {
@@ -42,14 +43,10 @@ public class HistorialService {
         return convertirDTO(historial);
     }
 
+    @CircuitBreaker(name = "reservaService", fallbackMethod = "fallbackReserva")
     public HistorialDTO guardar(HistorialDTO dto) {
 
-        ReservaDTO reserva = obtenerReserva(dto.getReservaId());
-
-        if ("No fue posible consultar el servicio. Intente nuevamente."
-                .equals(reserva.getEstado())) {
-            throw new RuntimeException(reserva.getEstado());
-        }
+        ReservaDTO reserva = reservaClient.obtenerReserva(dto.getReservaId());
 
         Historial historial = convertirEntidad(dto);
 
@@ -69,6 +66,15 @@ public class HistorialService {
         historial.setFecha(dto.getFecha());
 
         return convertirDTO(repository.save(historial));
+    }
+
+    private HistorialDTO fallbackReserva(HistorialDTO dto, Throwable ex) {
+
+        HistorialDTO fallback = new HistorialDTO();
+        fallback.setReservaId(dto.getReservaId());
+        fallback.setAccion("No fue posible consultar el servicio. Intente nuevamente.");
+
+        return fallback;
     }
 
     public void eliminar(Long id) {
