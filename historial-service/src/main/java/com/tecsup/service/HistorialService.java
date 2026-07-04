@@ -6,6 +6,8 @@ import com.tecsup.dto.ReservaDTO;
 import com.tecsup.exception.ResourceNotFoundException;
 import com.tecsup.model.Historial;
 import com.tecsup.repository.HistorialRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,10 +44,11 @@ public class HistorialService {
 
     public HistorialDTO guardar(HistorialDTO dto) {
 
-        ReservaDTO reserva = reservaClient.obtenerReserva(dto.getReservaId());
+        ReservaDTO reserva = obtenerReserva(dto.getReservaId());
 
-        if (reserva == null) {
-            throw new ResourceNotFoundException("Reserva no encontrada.");
+        if ("No fue posible consultar el servicio. Intente nuevamente."
+                .equals(reserva.getEstado())) {
+            throw new RuntimeException(reserva.getEstado());
         }
 
         Historial historial = convertirEntidad(dto);
@@ -59,7 +62,7 @@ public class HistorialService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Historial no encontrado con id: " + id));
 
-        reservaClient.obtenerReserva(dto.getReservaId());
+        obtenerReserva(dto.getReservaId());
 
         historial.setReservaId(dto.getReservaId());
         historial.setAccion(dto.getAccion());
@@ -75,6 +78,26 @@ public class HistorialService {
                         new ResourceNotFoundException("Historial no encontrado con id: " + id));
 
         repository.delete(historial);
+    }
+
+    @CircuitBreaker(name = "reservaService", fallbackMethod = "fallbackReserva")
+    @Retry(name = "reservaService")
+    public ReservaDTO obtenerReserva(Long reservaId) {
+        return reservaClient.obtenerReserva(reservaId);
+    }
+
+    public ReservaDTO fallbackReserva(Long reservaId, Exception ex) {
+
+        ReservaDTO reserva = new ReservaDTO();
+
+        reserva.setId(reservaId);
+        reserva.setClienteId(null);
+        reserva.setServicio("SERVICIO NO DISPONIBLE");
+        reserva.setFecha(null);
+        reserva.setHora(null);
+        reserva.setEstado("No fue posible consultar el servicio. Intente nuevamente.");
+
+        return reserva;
     }
 
     private HistorialDTO convertirDTO(Historial historial) {
