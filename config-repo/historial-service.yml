@@ -30,6 +30,10 @@ management:
       exposure:
         include: health,info,metrics
 
+  info:
+    env:
+      enabled: true
+
 app:
   messages:
     error-service: "No fue posible consultar el servicio. Intente nuevamente."
