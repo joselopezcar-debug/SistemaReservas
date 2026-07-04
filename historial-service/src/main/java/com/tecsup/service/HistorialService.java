@@ -28,6 +28,8 @@ public class HistorialService {
 
     public List<HistorialDTO> listar() {
 
+        logger.info("Listando historial");
+
         return repository.findAll()
                 .stream()
                 .map(this::convertirDTO)
@@ -35,6 +37,8 @@ public class HistorialService {
     }
 
     public HistorialDTO obtenerPorId(Long id) {
+
+        logger.info("Buscando historial con id {}", id);
 
         Historial historial = repository.findById(id)
                 .orElseThrow(() ->
@@ -46,29 +50,51 @@ public class HistorialService {
     @CircuitBreaker(name = "reservaService", fallbackMethod = "fallbackReserva")
     public HistorialDTO guardar(HistorialDTO dto) {
 
+        logger.info("Consultando reserva {} desde reserva-service", dto.getReservaId());
+
         ReservaDTO reserva = reservaClient.obtenerReserva(dto.getReservaId());
+
+        logger.info("Reserva encontrada correctamente");
 
         Historial historial = convertirEntidad(dto);
 
-        return convertirDTO(repository.save(historial));
+        logger.info("Registrando nuevo historial");
+
+        Historial guardado = repository.save(historial);
+
+        logger.info("Historial registrado correctamente con id {}", guardado.getId());
+
+        return convertirDTO(guardado);
     }
 
     public HistorialDTO actualizar(Long id, HistorialDTO dto) {
+
+        logger.info("Actualizando historial con id {}", id);
 
         Historial historial = repository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Historial no encontrado con id: " + id));
 
+        logger.info("Consultando reserva {} desde reserva-service", dto.getReservaId());
+
         obtenerReserva(dto.getReservaId());
+
+        logger.info("Reserva encontrada correctamente");
 
         historial.setReservaId(dto.getReservaId());
         historial.setAccion(dto.getAccion());
         historial.setFecha(dto.getFecha());
 
-        return convertirDTO(repository.save(historial));
+        Historial actualizado = repository.save(historial);
+
+        logger.info("Historial {} actualizado correctamente", id);
+
+        return convertirDTO(actualizado);
     }
 
     private HistorialDTO fallbackReserva(HistorialDTO dto, Throwable ex) {
+
+        logger.error("Circuit Breaker activado. reserva-service no disponible: {}", ex.getMessage());
 
         HistorialDTO fallback = new HistorialDTO();
         fallback.setReservaId(dto.getReservaId());
@@ -79,20 +105,29 @@ public class HistorialService {
 
     public void eliminar(Long id) {
 
+        logger.info("Eliminando historial con id {}", id);
+
         Historial historial = repository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Historial no encontrado con id: " + id));
 
         repository.delete(historial);
+
+        logger.info("Historial {} eliminado correctamente", id);
     }
 
     @CircuitBreaker(name = "reservaService", fallbackMethod = "fallbackReserva")
     @Retry(name = "reservaService")
     public ReservaDTO obtenerReserva(Long reservaId) {
+
+        logger.info("Consultando reserva {} desde reserva-service", reservaId);
+
         return reservaClient.obtenerReserva(reservaId);
     }
 
     public ReservaDTO fallbackReserva(Long reservaId, Exception ex) {
+
+        logger.error("No se pudo consultar la reserva {}: {}", reservaId, ex.getMessage());
 
         ReservaDTO reserva = new ReservaDTO();
 
@@ -127,5 +162,4 @@ public class HistorialService {
 
         return historial;
     }
-
 }
