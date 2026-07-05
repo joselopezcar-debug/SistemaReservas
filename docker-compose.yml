@@ -1,0 +1,132 @@
+version: "3.9"
+
+services:
+
+  mysql-cliente:
+    image: mysql:8.4
+    container_name: mysql-cliente
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: clientes_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_cliente_data:/var/lib/mysql
+    networks:
+      - reservas-network
+
+  mysql-reserva:
+    image: mysql:8.4
+    container_name: mysql-reserva
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: reservas_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_reserva_data:/var/lib/mysql
+    networks:
+      - reservas-network
+
+  mysql-historial:
+    image: mysql:8.4
+    container_name: mysql-historial
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: historial_db
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql_historial_data:/var/lib/mysql
+    networks:
+      - reservas-network
+
+  config-server:
+    build:
+      context: ./config-server
+    container_name: config-server
+    restart: always
+    ports:
+      - "8888:8888"
+    networks:
+      - reservas-network
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+    container_name: eureka-server
+    restart: always
+    depends_on:
+      - config-server
+    ports:
+      - "8761:8761"
+    networks:
+      - reservas-network
+
+  cliente-service:
+    build:
+      context: ./cliente-service
+    container_name: cliente-service
+    restart: always
+    depends_on:
+      - mysql-cliente
+      - config-server
+      - eureka-server
+    ports:
+      - "8081:8081"
+    networks:
+      - reservas-network
+
+  reserva-service:
+    build:
+      context: ./reserva-service
+    container_name: reserva-service
+    restart: always
+    depends_on:
+      - mysql-reserva
+      - config-server
+      - eureka-server
+    ports:
+      - "8082:8082"
+    networks:
+      - reservas-network
+
+  historial-service:
+    build:
+      context: ./historial-service
+    container_name: historial-service
+    restart: always
+    depends_on:
+      - mysql-historial
+      - config-server
+      - eureka-server
+    ports:
+      - "8083:8083"
+    networks:
+      - reservas-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    restart: always
+    depends_on:
+      - eureka-server
+      - cliente-service
+      - reserva-service
+      - historial-service
+    ports:
+      - "8089:8089"
+    networks:
+      - reservas-network
+
+networks:
+  reservas-network:
+
+volumes:
+  mysql_cliente_data:
+  mysql_reserva_data:
+  mysql_historial_data:
