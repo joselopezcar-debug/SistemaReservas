@@ -1,0 +1,246 @@
+{
+  "info": {
+    "_postman_id": "c76b2767-58d4-4fe3-920f-124715193161",
+    "name": "New Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53928378"
+  },
+  "item": [
+    {
+      "name": "POST Clientes",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Juan\",\r\n  \"apellido\": \"Perez\",\r\n  \"correo\": \"juan@test.com\",\r\n  \"telefono\": \"999999999\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/clientes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "clientes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST reservas",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"clienteId\": 1,\r\n    \"servicio\": \"Consulta\",\r\n    \"fecha\": \"2026-07-03\",\r\n    \"hora\": \"10:00\",\r\n    \"estado\": \"PENDIENTE\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8082/api/reservas",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "reservas"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST historial",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"reservaId\": 1,\r\n    \"accion\": \"CREADA\",\r\n    \"fecha\": \"2026-07-03T10:00:00\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8083/api/historial",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8083",
+          "path": [
+            "api",
+            "historial"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "cliente-service/default",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8888/cliente-service/default",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8888",
+          "path": [
+            "cliente-service",
+            "default"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "reserva-service/default",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8888/reserva-service/default",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8888",
+          "path": [
+            "reserva-service",
+            "default"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "historial-service/default",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8888/historial-service/default",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8888",
+          "path": [
+            "historial-service",
+            "default"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Resiliencia",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"reservaId\": 1,\r\n    \"accion\": \"CREADA\",\r\n    \"fecha\": \"2026-07-03T10:00:00\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8083/api/historial",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8083",
+          "path": [
+            "api",
+            "historial"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "actuator/health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/actuator/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "actuator",
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "actuator/info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/actuator/info",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "actuator",
+            "info"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "actuator/metrics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8083/actuator/metrics",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8083",
+          "path": [
+            "actuator",
+            "metrics"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
