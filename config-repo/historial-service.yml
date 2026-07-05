@@ -6,7 +6,7 @@ spring:
     name: historial-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/historial_db
+    url: jdbc:mysql://mysql-historial:3306/historial_db
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -22,7 +22,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server:8761/eureka/
 
 management:
   endpoints:

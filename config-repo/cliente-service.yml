@@ -6,7 +6,7 @@ spring:
     name: cliente-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/clientes_db
+    url: jdbc:mysql://mysql-cliente:3306/clientes_db
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -22,7 +22,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server:8761/eureka/
 
 management:
   endpoints:
